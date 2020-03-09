@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.freedom.myproject.mapper.InsideStaffMapper">
+
+<select id="insideLogin" parameterType="com.freedom.myproject.dto.InsideStaffDto" resultType="com.freedom.myproject.dto.InsideStaffDto">
+    select * from myplat_staff where insideUsername=#{insideUsername} and insidePassword=#{insidePassword} and flag1=1
+</select>
+
+    <!--查询内部人员信息-->
+    <select id="selectAllInsideStaff" resultType="com.freedom.myproject.dto.InsideStaffDto">
+  SELECT tb2.*,tb1.`insideTrueName` superName,tb3.`role`,tb4.`department`
+  FROM myplat_staff tb1
+  RIGHT OUTER JOIN myplat_staff tb2
+  ON tb2.`superInsideId`=tb1.`insideId`
+  LEFT OUTER JOIN myplat_role tb3
+  ON tb2.`insideRoleId`=tb3.`insideRoleId`
+  LEFT OUTER JOIN myplat_department tb4
+  ON tb4.`insideDepartmentId`=tb3.`insideDepartmentId` ORDER BY tb2.`insideRoleId`
+    </select>
+  <!--根据ID查询内部人员信息-->
+  <select id="selectStaffByIdInside" parameterType="int" resultType="com.freedom.myproject.dto.InsideStaffDto">
+    select * from myplat_staff where insideId=#{insideId}
+  </select>
+  <!--修改内部人员信息-->
+  <update id="updateStaffInfoInside" parameterType="com.freedom.myproject.dto.InsideStaffDto">
+    update myplat_staff
+    <set>
+      <if test="insideTrueName!=null and insideTrueName!=''">
+        insideTrueName=#{insideTrueName},
+      </if>
+      <if test="insidePhoneNumber!=null and insidePhoneNumber!=''">
+        insidePhoneNumber=#{insidePhoneNumber},
+      </if>
+      <if test="insideRoleId!=null and insideRoleId!=''">
+        insideRoleId=#{insideRoleId},
+      </if>
+
+     <if test="superInsideId!=null">
+        superInsideId=#{superInsideId},
+    </if>
+    </set>
+    where insideId=#{insideId}
+  </update>
+  <!--根据id修改管理人员密码-->
+  <update id="updateStaffPasswordById" parameterType="com.freedom.myproject.dto.InsideStaffDto">
+    update  myplat_staff set insidePassword=#{insidePassword} where insideId=#{insideId}
+  </update>
+  <!--根据Id删除内部人员信息-->
+  <delete id="deleteStaffById" parameterType="int">
+    delete from myplat_staff where insideId=#{insideId}
+  </delete>
+  <!--根据Id查询销售信息-->
+  <select id="selectSalesInfoById" parameterType="int" resultType="com.freedom.myproject.dto.InsideStaffSalesDto">
+    SELECT tb1.`insideId`,tb1.`insideTrueName`,tb2.`salRecordsId`,tb2.`targetSales`,tb2.`actualSales`,tb2.`unfinishedSales`,tb2.`month`
+    FROM
+    myplat_staff tb1 INNER JOIN sales_records tb2
+    ON
+    tb1.`insideId`=tb2.`indiseId`
+    AND
+    tb1.`insideId`=#{insideId}
+  </select>
+  <!--根据Id删除销售记录-->
+  <delete id="deleteSalesInfoById" parameterType="int">
+    delete from sales_records where salRecordsId=#{salRecordsId}
+  </delete>
+  <!--根据记录Id查询当前记录信息-->
+  <select id="selectSalesInfoBySalId" parameterType="int" resultType="com.freedom.myproject.dto.InsideStaffSalesDto">
+    select * from sales_records where salRecordsId=#{salRecordsId}
+  </select>
+  <!--根据记录Id来更改销售记录-->
+  <update id="updateSalesInfoById" parameterType="com.freedom.myproject.dto.InsideStaffSalesDto">
+    update sales_records set targetSales=#{targetSales},actualSales=#{actualSales},unfinishedSales=#{unfinishedSales},month=#{month} where salRecordsId=#{salRecordsId}
+  </update>
+  <!--新增销售信息-->
+  <insert id="insertSalesInfoById" parameterType="com.freedom.myproject.dto.InsideStaffSalesDto">
+    insert  into sales_records values (null,#{targetSales},#{actualSales},#{unfinishedSales},#{month},#{insideId})
+  </insert>
+  <!--内部人员重名验证-->
+  <select id="selectAllLoginNameInside" parameterType="java.lang.String" resultType="com.freedom.myproject.dto.InsideStaffDto">
+    select * from myplat_staff where insideUsername=#{insideUsername}
+  </select>
+  <!--新增系统管理员--><!--新增销售人员也用此statement只是传入参数有所区别-->
+  <insert id="insertPerInside" parameterType="com.freedom.myproject.dto.InsideStaffDto">
+    insert into myplat_staff
+    values
+    (null,#{insideUsername},#{insidePassword},#{insideTrueName},#{insidePhoneNumber},#{flag1},#{insideRoleId},#{superInsideId})
+  </insert>
+  <!--查询所有投诉信息-->
+  <select id="selectAllCompMesInside" resultType="com.freedom.myproject.dto.ComplaintMessageDto">
+    SELECT tb1.*,tb2.`entName`
+    FROM
+    complaint_message tb1,plat_customers tb2
+    WHERE
+    tb1.`entId`=tb2.`entId`
+  </select>
+  <!--删除投诉信息-->
+  <delete id="deleteCompMesById" parameterType="int">
+    delete from complaint_message where complMesId=#{complMesId}
+  </delete>
+  <!--查询所有订单-->
+  <select id="selectAllOrdersInside" resultType="com.freedom.myproject.dto.RechargeOrderDto">
+    SELECT tb2.`entName`,tb1.* FROM customers_recharge tb1,plat_customers tb2
+    WHERE
+    tb1.`entId`=tb2.`entId` order by tb2.`entName`
+  </select>
+</mapper>

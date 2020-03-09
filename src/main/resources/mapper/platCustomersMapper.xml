@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.freedom.myproject.mapper.PlatCustomersMapper">
+<!--平台客户注册-->
+    <insert id="insertPlatCustomers" parameterType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+  insert into plat_customers
+  (entId,loginName,password,entName,connectName,address,email,phoneNumber,status,registTime,balance,state)
+  values
+  (null,#{loginName},#{password},#{entName},#{connectName},#{address},#{email},#{phoneNumber},#{status},#{registTime},#{balance},#{state})
+    </insert>
+<!--注册登录名查重-->
+  <select id="checkLoginName" parameterType="java.lang.String" resultType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    select * from plat_customers where loginName=#{value}
+  </select>
+  <!--平台客户登录-->
+  <select id="loginPlatCustomers" parameterType="com.freedom.myproject.dto.PlatCustomersInfoDto" resultType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    select * from plat_customers where loginName=#{loginName} and password=#{password}
+  </select>
+  <!--定期修改企业帐户余额-->
+  <update id="updateBalance">
+    update  plat_customers set balance=balance-100;
+  </update>
+  <!--查询所有余额<0的企业帐户-->
+  <select id="selectAllCustomersBalanceLessThanzero" parameterType="int" resultType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    SELECT * FROM plat_customers WHERE balance&lt;=#{value};
+  </select>
+
+
+  <!--批量修改企业用户的帐户状态-->
+  <update id="updateStateBalanceLessThanzero" parameterType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    update plat_customers set state=#{state}
+    where entId in
+    <foreach collection="entIdList" item="entId" separator="," open="(" close=")">
+      #{entId}
+    </foreach>
+  </update>
+  <!--批量修改员工的帐户状态-->
+  <update id="updateStaffState" parameterType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    update staff set state=#{state}
+    where entId in
+    <foreach collection="entIdList" item="entId" separator="," open="(" close=")">
+      #{entId}
+    </foreach>
+  </update>
+
+  <!--重置密码-->
+  <update id="resetPassword" parameterType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    update plat_customers set password=#{password} where loginName=#{loginName} and email=#{email}
+  </update>
+  <!--帐户信息查询-->
+  <select id="selectPlatCustomersInfo" parameterType="int" resultType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    select * from plat_customers where entId=#{id}
+  </select>
+  <!--修改平台用户信息-->
+  <update id="changePlatCustomersInfo" parameterType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    update plat_customers set entName=#{entName},connectName=#{connectName},address=#{address},email=#{email},phoneNumber=#{phoneNumber} where entId=#{entId}
+  </update>
+  <!--修改平台用户密码-->
+  <update id="changePlatCustomersPassword" parameterType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    update plat_customers set password=#{password} where entId=#{entId}
+  </update>
+  <!--使用插件分页-->
+  <select id="selectAllCustomers" resultType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    select * from plat_customers order by entId
+  </select>
+
+
+  <!--改变企业账户的状态-->
+  <update id="changeState" parameterType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    update plat_customers set state=#{state} where entId=#{entId}
+  </update>
+  <!--改变企业员工的账户状态-->
+  <update id="changeState2" parameterType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    update staff set state=#{state} where entId=#{entId}
+  </update>
+
+
+  <!--增加客户的充值记录-->
+  <insert id="insertRechargeOrder" parameterType="com.freedom.myproject.po.RechargeOrder">
+    insert into customers_recharge
+    values
+    (null,#{orderNumber},#{zfbTradeNumber},#{rechargeAmount},#{rechargeTime},#{state},#{entId},#{subject})
+  </insert>
+  <!--获取订单信息-->
+  <select id="selectRechargeOrder" parameterType="java.lang.String" resultType="com.freedom.myproject.po.RechargeOrder">
+    select * from customers_recharge where orderNumber=#{orderNumber}
+  </select>
+  <!--修改客户订单状态-->
+  <update id="updateRechargeOrder" parameterType="com.freedom.myproject.po.RechargeOrder">
+    update customers_recharge
+    set zfbTradeNumber=#{zfbTradeNumber},rechargeTime=#{rechargeTime},state=#{state}
+    where orderNumber=#{orderNumber}
+  </update>
+  <!--根据entId查询企业用户订单-->
+  <select id="selectCustomersOrderById" parameterType="com.freedom.myproject.dto.RechargeOrderDto" resultType="com.freedom.myproject.po.RechargeOrder">
+    select * from customers_recharge where entId=#{entId}
+  </select>
+  <!--根据rechargeId删除订单-->
+  <delete id="deleteCustomersOrderById" parameterType="int">
+    delete from customers_recharge where rechargeId=#{rechargeId}
+  </delete>
+  <!--修改企业用户余额-->
+  <update id="updatebalanceByEntId" parameterType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+  update  plat_customers set balance=balance+#{balance} where entId=#{entId}
+  </update>
+  <!--查询企业用户余额-->
+  <select id="selectPlatCustomersBalanceById" parameterType="int" resultType="com.freedom.myproject.dto.PlatCustomersInfoDto">
+    select * from plat_customers where entId=#{entId}
+  </select>
+</mapper>

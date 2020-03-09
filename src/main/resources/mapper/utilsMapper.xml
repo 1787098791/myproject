@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.freedom.myproject.mapper.UtilsMapper">
+
+    <!--添加投诉内容-->
+
+    <insert id="insertComplaintMessage" parameterType="com.freedom.myproject.po.ComplaintMessage">
+        insert into complaint_message
+        values
+        (null,#{entId},#{complMessage})
+    </insert>
+    <!--帐户余额提醒-->
+    <insert id="insertRemindMessage" parameterType="com.freedom.myproject.po.RemindMessage">
+        insert into remind_customers (remindMessId,remindMessageText,entId) values (null,#{remindMessageText},#{entId})
+    </insert>
+</mapper>

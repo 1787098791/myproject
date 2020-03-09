@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>企业用户注册</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!--<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">-->
+    <!--<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>-->
+    <!--<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+    <!-- HTML5 Shiv 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="container">
+    <form id="theform" name="theform">
+
+    <div class="row" style="margin-top: 50px;margin-bottom: 20px">
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+           登录名　：<input type="text" name="loginName" id="loginName" style="margin-bottom: 20px"> <br>
+           登录密码：<input type="password" name="password" id="password" style="margin-bottom: 20px"><br>
+           确认密码：<input type="password" name="repassword" id="repassword" style="margin-bottom: 20px"><br>
+           企业名称：<input type="text" name="entName" id="entName" style="margin-bottom: 20px"><br>
+           联系人　：<input type="text" name="connectName" id="connectName" style="margin-bottom: 20px"><br>
+           地址　　：<input type="text" name="address" id="address" style="margin-bottom: 20px"><br>
+           邮箱　　：<input type="text" name="email" id="email" style="margin-bottom: 20px"><br>
+           手机号码：<input type="text" name="phoneNumber" id="phoneNumber" style="margin-bottom: 20px"><br>
+            <input type="submit" class="btn btn-primary" style="margin-left: 100px;margin-bottom: 20px" value="确认提交"></input>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+        </div>
+    </div>
+    </form>
+</div>
+
+
+<!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
+<script src="jquery/jquery-2.1.1.min.js"></script>
+<!-- 包括所有已编译的插件 -->
+<script src="js/bootstrap.min.js"></script>
+<!--引入验证插件-->
+<script src="js/jquery.validate.min.js"></script>
+<script>
+    $(function () {
+        $("#theform").validate({
+
+            onsubmit:true,
+            rules:{
+                loginName:{
+                    required:true,
+                    //验证登录名是否重复
+                    checkloginNameRE:true,
+                    checkloginName:true,
+                },
+                password:{
+                    required:true,
+                    checkpassword:true,
+                },
+                repassword:{
+                    required:true,
+                    equalTo:"#password",
+                },
+                entName:{
+                    required:true,
+                    checkentName:true,
+                },
+                connectName:{
+                    required:true,
+                    checkconnectName:true,
+                },
+                address:{
+                    required:true,
+                    checkaddress:true,
+                },
+                email:{
+                    required:true,
+                    checkemail:true,
+                },
+                phoneNumber:{
+                    required:true,
+                    checkphoneNumber:true,
+                },
+
+            },
+            messages:{
+                loginName:{
+                    required:"<span style='color: red'>"+"请输入用户名"+"</span>",
+                    checkloginNameRE:"<span style='color: red'>"+"该用户名已经被使用"+"</span>",
+                    checkloginName:"<span style='color: red'>"+"用户名格式不正确"+"</span>",
+                },
+                password:{
+                    required:"<span style='color: red'>"+"请输入密码"+"</span>",
+                    checkpassword:"<span style='color: red'>"+"密码格式不正确"+"</span>",
+                },
+                repassword:{
+                    required:"<span style='color: red'>"+"请再次输入密码"+"</span>",
+                    equalTo:"<span style='color: red'>"+"密码不一致"+"</span>",
+                },
+                entName:{
+                    required:"<span style='color: red'>"+"公司名不能为空"+"</span>",
+                    checkentName:"<span style='color: red'>"+"公司名长度不能超过20"+"</span>",
+                },
+                connectName:{
+                    required:"<span style='color: red'>"+"联系人不能为空"+"</span>",
+                    checkconnectName:"<span style='color: red'>"+"长度不能超过20"+"</span>",
+                },
+                address:{
+                    required:"<span style='color: red'>"+"地址不能为空"+"</span>",
+                    checkaddress:"<span style='color: red'>"+"长度不能超过30"+"</span>",
+                },
+                email:{
+                    required:"<span style='color: red'>"+"请输入邮箱"+"</span>",
+                    checkemail:"<span style='color: red'>"+"邮箱格式不正确"+"</span>",
+                },
+                phoneNumber:{
+                    required:"<span style='color: red'>"+"请输入电话号码"+"</span>",
+                    phoneNumber:"<span style='color: red'>"+"电话号码格式不正确"+"</span>",
+                }
+            },
+            submitHandler:function () {
+                $.ajax({
+                    url:"entpriseregist",
+                    type:"post",
+                    data:JSON.stringify({
+                        "loginName":$("#loginName").val(),
+                        "password":$("#password").val(),
+                        "entName":$("#entName").val(),
+                        "connectName":$("#connectName").val(),
+                        "address":$("#address").val(),
+                        "email":$("#email").val(),
+                        "phoneNumber":$("#phoneNumber").val()
+                    }),
+                    contentType:"application/json;charset=utf-8",
+                    dataType:"json",
+                    success:function(data) {
+                        if (data){
+                            window.location.href="entlogin.html"
+                        }else{
+                            window.location.reload();
+                        }
+                    },
+                    error:function (data) {
+                        console.log("请求有误！！！")
+                    }
+
+                })
+            }
+
+        });
+
+
+        //自定义验证函数的代码value代表我们输入的值，element代表值对应的那个元素，param代表调用此方法时传入的参数
+        $.validator.addMethod("checkloginName",function(value,element,params){
+            return value.length>=2&&value.length<=20;
+        },"");
+        $.validator.addMethod("checkloginNameRE",function(value,element,params){
+            var loginName = encodeURI(encodeURI(value));
+            var flag;
+            $.ajax({
+                async: false,//改异步为同步
+                url:"checkLoginName?loginName="+loginName,
+                type:"get",
+                dataType:"json",
+                success:function(data){
+                    flag=data;
+                },
+                error:function (data) {
+
+                }
+
+            })
+
+            return flag;
+        },"");
+        $.validator.addMethod("checkentName",function(value,element,params){
+            return value.length>0&&value.length<=20;
+        },"");
+        $.validator.addMethod("checkpassword",function(value,element,params){
+            var regex=/^[a-zA-Z0-9]{6,11}$/
+            return regex.test(value);
+        },"");
+        $.validator.addMethod("checkconnectName",function(value,element,params){
+            return value.length>=2&&value.length<=20;
+        },"");
+        $.validator.addMethod("checkaddress",function(value,element,params){
+            return value.length>0&&value.length<=30;
+        },"");
+        $.validator.addMethod("checkemail",function(value,element,params){
+            var regex=/^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/
+            return regex.test(value);
+        },"");
+        $.validator.addMethod("checkphoneNumber",function(value,element,params){
+            var regex=/^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/
+            return regex.test(value);
+        },"");
+
+    })
+
+</script>
+
+
+</body>
+</html>

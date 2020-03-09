@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+      http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+    <!-- 1、配置自定控制器扫描路径 -->
+    <!--这里配置的是controller的路径-->
+    <context:component-scan base-package="com.freedom.myproject.controller"></context:component-scan>
+    <!-- 2、配置静态资源处理 -->
+    <!--如果该请求已经作了映射，那么会接着交给后台对应的处理程序，如果没有作映射，就交给 WEB 应用服务器默认的 Servlet 处理-->
+    <mvc:default-servlet-handler />
+    <!-- 3、配置注解驱动 ：处理器映射器和处理器适配器 -->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+    <!--4、配置视图解析器-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+     <!--   <property name="prefix" value="/"></property>
+        <property name="suffix" value=".html"></property>-->
+    </bean>
+
+    <!-- 使用thymeleaf解析，这样就要修改以前配置的视图解析器 -->
+    <!--配置模板解析器-->
+   <!-- <bean id="templateResolver"
+          class="org.thymeleaf.spring4.templateresolver.SpringResourceTemplateResolver">
+       &lt;!&ndash; <property name="prefix" value="/" />
+        <property name="suffix" value=".html" />&ndash;&gt;
+        <property name="templateMode" value="HTML5"/>
+        <property name="cacheable" value="false"/>
+        <property name="characterEncoding" value="UTF-8"/>
+    </bean>
+    &lt;!&ndash;配置模板引擎&ndash;&gt;
+    <bean id="templateEngine"
+          class="org.thymeleaf.spring4.SpringTemplateEngine">
+        <property name="templateResolver" ref="templateResolver" />
+    </bean>
+    &lt;!&ndash;配置thymeleaf视图解析器&ndash;&gt;
+    <bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
+        <property name="characterEncoding" value="UTF-8"/>
+        <property name="templateEngine" ref="templateEngine"/>
+    </bean>-->
+
+
+    <!--配置文件上传处理者-->
+    <bean name="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!--dropzone上传限制大小用-->
+       <!-- <property name="maxUploadSize" value="10485760"/>-->
+        <property name="defaultEncoding" value="UTF-8"></property>
+    </bean>
+
+
+
+
+    <mvc:interceptors>
+        <!--配置登录拦截器-->
+        <mvc:interceptor>
+            <!--如果拦截所有（/**）那么静态资源也拦截了-->
+            <mvc:mapping path="/**"/>
+            <bean class="com.freedom.myproject.utils.MyInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+  
+</beans>

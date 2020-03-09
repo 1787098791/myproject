@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>内部人员管理</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-switch.min.css">
+    <script src="jquery/jquery-2.1.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-switch.min.js"></script>
+
+    <!--<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">-->
+    <!--<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>-->
+    <!--<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+    <!-- HTML5 Shiv 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="container">
+
+    <div class="row" style="height: 50px">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+            <span style="color: yellow"><b><i><h3>SUNRISE系统管理平台!</h3></i></b></span>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+
+
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <button type="button" style="height: 50px" class="btn btn-success" onclick="mainInside()">首页</button>
+            <button type="button" style="height: 50px" class="btn btn-success" onclick="exit()">退出登录</button>
+            <button type="button" style="height: 50px" class="btn btn-success" onclick="jumpToComplaint()">客户投诉</button>
+        </div>
+    </div>
+    <div class="row" style="height: 520px;">
+        <div style="margin-top: 100px">
+
+            <div><b> <a onclick="addsysper()"  style="cursor:pointer;color: red" >新增系统管理员/</a><a onclick="addsalesper()" style="cursor:pointer;color: red;" >新增销售人员</a></b></div>
+            <table  class="table table-bordered" style="height:320px;color: #3c3c3c;margin-bottom: 0px">
+                <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>登录名</th>
+                    <th>真实姓名</th>
+                    <th>电话号码</th>
+                    <th>职位</th>
+                    <th>所属部门</th>
+                    <th>上级负责人</th>
+                    <th style="width: 200px">操作</th>
+                </tr>
+                </thead>
+                <tbody id="thebody">
+
+                </tbody>
+            </table>
+            <div style="margin:auto;text-align: center">
+                <ul class="pagination" id="page">
+
+                </ul>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <script>
+    var pageNo;//当前页
+    var count = window.location.search.split("=")[1];
+    if (count!=undefined){
+        pageNo=count;
+    } else {
+        pageNo=1;
+    }
+        var totalpage;//总页数
+        var endpage;//显示的尾页
+        function page(page){
+            pageNo=page;
+            $.ajax({
+                url:"selectAllStaffByPageInside?pageNo="+pageNo,
+                type:"get",
+                dataType:"json",
+                success:function(data) {
+                    pageNo=data.pageNum;
+                    totalpage=data.pages;
+                    var str;
+                    if (pageNo<=1){
+                        str="<li><a style=\"cursor:pointer\" >&laquo;</a></li>"
+                    } else{
+                        str="<li><a style=\"cursor:pointer\" onclick='pageall("+(pageNo-1)+")'>&laquo;</a></li>"
+                    }
+                    if (pageNo+3<totalpage){
+                        endpage=pageNo+3;
+                    } else{
+                        endpage=totalpage;
+                    }
+                    for (var i=pageNo;i<=endpage;i=i+1) {
+                        str+= "<li><a style=\"cursor:pointer\" onclick='pageall("+i+")'>"+i+"</a></li>"
+                    }
+                    if (pageNo>=totalpage){
+                        str+="<li><a style=\"cursor:pointer\" >&raquo;</a></li>"
+                    } else{
+                        str+="<li><a style=\"cursor:pointer\" onclick='pageall("+(pageNo+1)+")'>&raquo;</a></li>"
+                    }
+                    $("#page").empty();
+                    $("#page").append(str);
+                    var list = data.list;
+                    //清空原先的
+                    $("#thebody").empty();
+                    $(list).each(function(i,n) {
+                        var str;
+                        if (n.department=="系统维护部") {
+                            str="<tr><td>"+n.insideId+"</td>"+
+                                "<td>"+n.insideUsername+"</td>"+
+                                "<td>"+n.insideTrueName+"</td>"+
+                                "<td>"+n.insidePhoneNumber+"</td>"+
+                                "<td>"+n.role+"</td>"+
+                                "<td>"+n.department+"</td>"+
+                                "<td>"+n.superName+"</td>"+
+                                "<td style=\"width: 300px\"><button  type='button' onclick='updateInfo("+n.insideId+")' class='btn btn-info'>修改信息</button>" +
+                                "<button  type='button' onclick='deleteInfo("+n.insideId+")' class='btn btn-info'>删除信息</button>"+
+                                "<button  type='button' onclick='updatePassword("+n.insideId+")' class='btn btn-info'>修改密码</button>"+
+                                "</td>"+
+                                "</tr>"
+                        }else{
+                            str="<tr><td>"+n.insideId+"</td>"+
+                                "<td>"+n.insideUsername+"</td>"+
+                                "<td>"+n.insideTrueName+"</td>"+
+                                "<td>"+n.insidePhoneNumber+"</td>"+
+                                "<td>"+n.role+"</td>"+
+                                "<td>"+n.department+"</td>"+
+                                "<td>"+n.superName+"</td>"+
+                                "<td style=\"width: 300px\"><button type='button' onclick='updateInfo("+n.insideId+")' class='btn btn-info'>修改信息</button>" +
+                                "<button type='button' onclick='deleteInfo("+n.insideId+")' class='btn btn-info'>删除信息</button>"+
+                                "<button type='button' onclick='salesInfo("+n.insideId+")' class='btn btn-info'>销售记录</button>"+
+                                "</td>"+
+                                "</tr>"
+                        }
+                        $("#thebody").append(str)
+                    })
+                },
+                error:function (data) {
+                    console.log("请求有误！！！")
+                }
+
+            })
+        }
+        page(pageNo);//页面加载时自动加载第一页
+        function pageall(nowpage) {
+            page(nowpage);
+        }
+
+        /**
+         * 修改消息
+         */
+        function updateInfo(id) {
+        window.location.href="changinfoInside.html?insideId="+id+"&pageNo="+pageNo;
+        }
+        /**
+         * 帐户退出
+         */
+        function exit() {
+            $.ajax({
+                url: "exitInside",
+                type: "post",
+                dataType: "json",
+                success: function (data) {
+                    window.location.href="rsmain.html";
+                },
+                error:function (data) {
+
+                }
+            })
+        }
+        /**
+         * 跳回首页
+         */
+        function mainInside() {
+            window.location.href="rsmainInside.html"
+
+        }
+        /**
+         * 修改系统管理员密码
+         */
+        function updatePassword(insideId) {
+            window.location.href="changepasswordInside.html?insideId="+insideId+"&pageNo="+pageNo;
+        }
+        /**
+         * 删除内部人员信息
+         */
+        function deleteInfo(insideId) {
+            $.ajax({
+                url: "deleteStaffByIdInside?insideId="+insideId,
+                type: "get",
+                dataType: "json",
+                success: function (data) {
+                    window.location.href="permanageInside.html?pageNo="+pageNo;
+                },
+                error:function (data) {
+                }
+            })
+        }
+        /**
+         * 展示销售记录
+         */
+        function salesInfo(insideId) {
+            window.location.href="salesrecordsInside.html?insideId="+insideId+"&pageNo="+pageNo;
+        }
+        /**
+         * 进入投诉中心
+         */
+        function jumpToComplaint() {
+            window.location.href="complaintInside.html?pageNo="+pageNo;
+        }
+
+    /**
+     * 新增系统管理人员
+     */
+    function addsysper() {
+        window.location.href="addsystemperInside.html?pageNo="+pageNo;
+    }
+
+    /**
+     * 新增销售人员
+     */
+    function addsalesper() {
+        window.location.href="addsalesperInside.html?pageNo="+pageNo;
+
+    }
+    </script>
+</div>
+</body>
+</html>

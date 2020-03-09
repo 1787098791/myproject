@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>修改内部人员信息</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!--<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">-->
+    <!--<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>-->
+    <!--<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+    <!-- HTML5 Shiv 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="container">
+
+    <form id="theform" name="theform">
+
+        <div class="row" style="margin-top: 50px;margin-bottom: 20px">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                登录名　：<input readonly="readonly" type="text" name="insideUsername" id="insideUsername" style="margin-bottom: 20px"><span style="color: yellow;">登录名不可修改</span> <br>
+                真实姓名：<input type="text" name="insideTrueName" id="insideTrueName" style="margin-bottom: 20px"><br>
+                电话号码：<input type="text" name="insidePhoneNumber" id="insidePhoneNumber" style="margin-bottom: 20px"><br>
+                角色职位：<select  name="insideRoleId" id="insideRoleId">
+
+                <option value="1">1(系统管理员)</option>
+                <option value="2">2(销售主管)</option>
+                <option value="3">3(销售员)</option>
+            </select><br><span style="color: yellow;margin-bottom: 20px">如果角色更改为系统管理员，那么必须修改密码！</span> <br>
+                上级领导：<input type="text" name="superInsideId" id="superInsideId" style="margin-bottom: 20px" placeholder="请输入对应的正确编号"><span style="color: yellow;">没有请输入0</span><br>
+                <input type="submit" class="btn btn-primary" style="margin-left: 100px;margin-bottom: 20px" value="确认提交"></input> &nbsp; <a style="cursor: pointer" onclick="reback()">返回</a>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
+<script src="jquery/jquery-2.1.1.min.js"></script>
+<!-- 包括所有已编译的插件 -->
+<script src="js/bootstrap.min.js"></script>
+<!--引入验证插件-->
+<script src="js/jquery.validate.min.js"></script>
+<script>
+    //还需要获得页码
+     var strings = window.location.search.substring(1).split("&");
+     var insideId = strings[0].split("=")[1];
+     var pageNo = strings[1].split("=")[1];
+    $.ajax({
+        url:"selectStaffByIdInside?insideId="+insideId,
+        type:"get",
+        dataType:"json",
+        success:function(data) {
+                $(data).each(function (i,n) {
+                    $("#insideUsername").val(n.insideUsername),
+                    $("#insideTrueName").val(n.insideTrueName),
+                    $("#insidePhoneNumber").val(n.insidePhoneNumber),
+                    $("#insideRoleId").val(n.insideRoleId),
+                    $("#superInsideId").val(n.superInsideId)
+                })
+        }
+
+
+    })
+
+    $(function () {
+        $("#theform").validate({
+
+            onsubmit:true,
+            rules:{
+                insideTrueName:{
+                    required:true,
+                    checkinsideTrueName:true,
+                },
+                superInsideId:{
+                    required:true,
+                    checksuperInsideId:true,
+                },
+                insidePhoneNumber:{
+                    required:true,
+                    checkinsidePhoneNumber:true,
+                },
+                insideRoleId:{
+                    required:true,
+                },
+
+            },
+            messages:{
+                insideTrueName:{
+                    required:"<span style='color: red'>"+"请输入真实姓名"+"</span>",
+                    checkinsideTrueName:"<span style='color: red'>"+"姓名格式不正确"+"</span>",
+                },
+                superInsideId:{
+                    required:"<span style='color: red'>"+"请输入id"+"</span>",
+                    checksuperInsideId:"<span style='color: red'>"+"id格式不正确"+"</span>",
+                },
+                insidePhoneNumber:{
+                    required:"<span style='color: red'>"+"请输入电话号码"+"</span>",
+                    checkinsidePhoneNumber:"<span style='color: red'>"+"电话号码格式不正确"+"</span>",
+                }
+            },
+            submitHandler:function () {
+                $.ajax({
+                    url:"updateStaffInfoInside",
+                    type:"post",
+                    data:JSON.stringify({
+                        "insideId":insideId,
+                        "insideTrueName":$("#insideTrueName").val(),
+                        "insidePhoneNumber":$("#insidePhoneNumber").val(),
+                        "insideRoleId":$("#insideRoleId").val(),
+                        "superInsideId":$("#superInsideId").val(),
+                    }),
+                    contentType:"application/json;charset=utf-8",
+                    dataType:"json",
+                    success:function(data) {
+                      if(data){
+                          window.location.href="permanageInside.html?pageNo="+pageNo;
+
+                      }
+                    },
+                    error:function (data) {
+                        console.log("请求有误！！！")
+                    }
+
+                })
+            }
+
+        });
+
+
+        //自定义验证函数的代码value代表我们输入的值，element代表值对应的那个元素，param代表调用此方法时传入的参数
+        $.validator.addMethod("checkinsideTrueName",function(value,element,params){
+            return value.length>=2&&value.length<=20;
+        },"");
+
+        $.validator.addMethod("checksuperInsideId",function(value,element,params){
+            var regex=/^[0-9]{1}[0-9]*$/
+            return regex.test(value);
+        },"");
+
+        $.validator.addMethod("checkinsidePhoneNumber",function(value,element,params){
+            var regex=/^[1](([3][0-9])|([4][5-9])|([5][0-3,5-9])|([6][5,6])|([7][0-8])|([8][0-9])|([9][1,8,9]))[0-9]{8}$/
+            return regex.test(value);
+        },"");
+
+    })
+
+    function reback() {
+        window.location.href="permanageInside.html?pageNo="+pageNo;
+
+    }
+</script>
+
+
+</body>
+</html>

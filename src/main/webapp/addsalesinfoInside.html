@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增销售信息</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!--<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">-->
+    <!--<script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>-->
+    <!--<script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
+    <!-- HTML5 Shiv 和 Respond.js 用于让 IE8 支持 HTML5元素和媒体查询 -->
+    <!-- 注意： 如果通过 file://  引入 Respond.js 文件，则该文件无法起效果 -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="container">
+    <form id="theform" name="theform">
+
+        <div class="row" style="margin-top: 50px;margin-bottom: 20px">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                目标销量　：<input type="text" name="targetSales" id="targetSales" style="margin-bottom: 20px"> <br>
+                实际销量　：<input type="text" name="actualSales" id="actualSales" style="margin-bottom: 20px"><br>
+                未完成销量：<input type="text" name="unfinishedSales" id="unfinishedSales" style="margin-bottom: 20px"><br>
+                月份　　　：<input type="text" name="month" id="month" style="margin-bottom: 20px"><br>
+
+                <input type="submit" class="btn btn-primary" style="margin-left: 100px;margin-bottom: 20px" value="确认提交"></input>&nbsp; <a href="javascript:history.go(-1)">返回上一步</a>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
+<script src="jquery/jquery-2.1.1.min.js"></script>
+<!-- 包括所有已编译的插件 -->
+<script src="js/bootstrap.min.js"></script>
+<!--引入验证插件-->
+<script src="js/jquery.validate.min.js"></script>
+<script>
+    var s = window.location.search.substring(1)
+    var strings = s.split("&");
+    var insideId = strings[0].split("=")[1];
+    var pageNo = strings[1].split("=")[1];
+    $(function () {
+        $("#theform").validate({
+
+            onsubmit:true,
+            rules:{
+                targetSales:{
+                    required:true,
+                    checktargetSales:true,
+                },
+                actualSales:{
+                    required:true,
+                    checkactualSales:true,
+                },
+                unfinishedSales:{
+                    required:true,
+                    checkunfinishedSales:true,
+                },
+                month:{
+                    required:true,
+                    checkmonth:true,
+                },
+            },
+            messages:{
+                targetSales:{
+                    required:"<span style='color: red'>"+"请输入"+"</span>",
+                    checktargetSales:"<span style='color: red'>"+"格式不正确"+"</span>",
+                },
+                actualSales:{
+                    required:"<span style='color: red'>"+"请输入"+"</span>",
+                    checkactualSales:"<span style='color: red'>"+"格式不正确"+"</span>",
+                },
+                unfinishedSales:{
+                    required:"<span style='color: red'>"+"请输入"+"</span>",
+                    checkunfinishedSales:"<span style='color: red'>"+"格式不正确"+"</span>",
+                },
+                month:{
+                    required:"<span style='color: red'>"+"请输入"+"</span>",
+                    checkmonth:"<span style='color: red'>"+"格式不正确"+"</span>",
+                },
+            },
+            submitHandler:function () {
+                $.ajax({
+                    url:"insertSalesInfoByIdInside",
+                    type:"post",
+                    data:JSON.stringify({
+                        "targetSales":$("#targetSales").val(),
+                        "actualSales":$("#actualSales").val(),
+                        "unfinishedSales":$("#unfinishedSales").val(),
+                        "month":$("#month").val(),
+                        "insideId":insideId
+                    }),
+                    contentType:"application/json;charset=utf-8",
+                    dataType:"json",
+                    success:function(data) {
+                        if (data){
+                            //alert("修改成功！")
+                            window.location.href="salesrecordsInside.html?insideId="+insideId+"&pageNo="+pageNo;
+                        }
+                    },
+                    error:function (data) {
+                        console.log("请求有误！！！")
+                    }
+
+                })
+            }
+
+        });
+        //自定义验证函数的代码value代表我们输入的值，element代表值对应的那个元素，param代表调用此方法时传入的参数
+        $.validator.addMethod("checktargetSales",function(value,element,params){
+            var regex=/^[0-9]+$/
+            return regex.test(value);
+        },"");
+        $.validator.addMethod("checkactualSales",function(value,element,params){
+            var regex=/^[0-9]+$/
+            return regex.test(value);
+        },"");
+        $.validator.addMethod("checkunfinishedSales",function(value,element,params){
+            var regex=/^[0-9]+$/
+            return regex.test(value);
+        },"");
+        $.validator.addMethod("checkmonth",function(value,element,params){
+            var regex=/^[0-9]+$/
+            return regex.test(value);
+        },"");
+    })
+
+</script>
+
+
+</body>
+</html>

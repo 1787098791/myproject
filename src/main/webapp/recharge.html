@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>充值界面</title>
+    <link rel="stylesheet" type="text/css" href="css/amazeui.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <script src="jquery/jquery-2.1.1.min.js"></script>
+    <script src="js/jquery.validate.min.js"></script>
+</head>
+
+<body id="thebody">
+<div class="pay">
+    <!--主内容开始编辑-->
+    <div class="tr_recharge">
+        <div class="tr_rechtext">
+            <p class="te_retit"><img src="img/coin.png" alt="" />充值中心</p>
+        </div>
+        <form  class="am-form" id="doc-vld-msg">
+            <div class="tr_rechbox">
+                <div class="tr_rechhead">
+                    <span ><a style="cursor: pointer" onclick="selectOrders()">订单查询</a></span>/
+                    <span ><a href="personalcenter.html">返回个人中心</a></span>
+                    <div class="tr_rechheadcion">
+                        <img src="img/coin.png" alt="" />
+                        <span>当前余额：<span id="myspan"></span></span>
+                    </div>
+                </div>
+                <div class="tr_rechli am-form-group">
+                    <ul class="ui-choose am-form-group" id="uc_01">
+                        <li>
+                            <label class="am-radio-inline">
+                                <input type="radio"  value="" name="docVlGender" required data-validation-message="请选择一项充值额度"> 10000￥
+                            </label>
+                        </li>
+                        <li>
+                            <label class="am-radio-inline">
+                                <input type="radio" name="docVlGender" data-validation-message="请选择一项充值额度"> 50000￥
+                            </label>
+                        </li>
+
+                        <li>
+                            <label class="am-radio-inline">
+                                <input type="radio" name="docVlGender" data-validation-message="请选择一项充值额度"> 100000￥
+                            </label>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <br>
+                <div class="tr_rechcho am-form-group">
+                    <span>充值方式：</span>
+
+                    <label class="am-radio" style="margin-right:30px;">
+                        <input  type="radio" id="radio1" name="radio1"    data-am-ucheck data-validation-message="请选择一种充值方式"><img src="img/zfbpay.png"/>
+                    </label>
+                    <span id="myspan2" style="color: red"> </span>
+                </div>
+                <div class="tr_rechnum">
+                    <span>应付金额：</span>
+                    <p class="rechnum" id="mymoney">0.00</p>元
+                </div>
+            </div>
+            <div class="tr_paybox">
+                <input type="button" value="确认支付" class="tr_pay am-btn" onclick="pay()" />
+                <span>温馨提示：招兵币只限于在简历详情中购买简历，遇到问题请拨打联系电话。</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="js/amazeui.min.js"></script>
+<script type="text/javascript" src="js/ui-choose.js"></script>
+
+<script type="text/javascript">
+
+    var s = window.location.search.substring(1)
+    var strings = s.split("&")
+    var entId = strings[0].split("=")[1];
+    var balance = strings[1].split("=")[1];
+    //alert(balance)
+
+    $("#myspan").text(balance);
+    // 将所有.ui-choose实例化
+    $('.ui-choose').ui_choose();
+    // uc_01 ul 单选
+    var uc_01 = $('#uc_01').data('ui-choose'); // 取回已实例化的对象
+    uc_01.click = function(index, item) {
+        console.log('click', index, item.text())
+    }
+    uc_01.change = function(index, item) {
+        console.log('change', index, item.text())
+    }
+    $(function() {
+        $('#uc_01 li:eq(3)').click(function() {
+            $('.tr_rechoth').show();
+            $('.tr_rechoth').find("input").attr('required', 'true')
+            $('.rechnum').text('10000.00');
+        })
+        $('#uc_01 li:eq(0)').click(function() {
+            $('.tr_rechoth').hide();
+            $('.rechnum').text('10000.00');
+
+        })
+        $('#uc_01 li:eq(1)').click(function() {
+            $('.tr_rechoth').hide();
+            $('.rechnum').text('50000.00');
+        })
+        $('#uc_01 li:eq(2)').click(function() {
+            $('.tr_rechoth').hide();
+            $('.rechnum').text('100000.00');
+        })
+
+    })
+
+    $(function() {
+        $('#doc-vld-msg').validator({
+            onValid: function(validity) {
+                $(validity.field).closest('.am-form-group').find('.am-alert').hide();
+            },
+            onInValid: function(validity) {
+                var $field = $(validity.field);
+                var $group = $field.closest('.am-form-group');
+                var $alert = $group.find('.am-alert');
+                // 使用自定义的提示信息 或 插件内置的提示信息
+                var msg = $field.data('validationMessage') || this.getValidationMessage(validity);
+
+                if(!$alert.length) {
+                    $alert = $('<div class="am-alert am-alert-danger"></div>').hide().
+                    appendTo($group);
+                }
+                $alert.html(msg).show();
+            }
+        });
+    });
+
+    /**
+     * 跳转支付
+     */
+    function pay() {
+    //获取需要支付的金额
+        //alert(1)
+        //alert($('input:radio[name="radio1"]:checked').val()==null)
+        if ($('input:radio[name="radio1"]:checked').val()==null){
+            $("#myspan2").text("请选择支付方式")
+            return false;
+        }
+
+        var money = $("#mymoney").text();
+        //alert(money)
+        //alert(entId)
+        //给一个商品名
+        var str="会员充值"
+        var subject = encodeURI(encodeURI(str));
+        $.ajax({
+            url:"pay?entId="+entId+"&rechargeAmount="+money+"&subject="+subject,
+            type:"get",
+            dataType:"text",
+            success:function(data) {
+                $("#thebody").html(data);
+            },
+            error:function (data) {
+                console.log("错误！！！")
+            }
+        })
+    }
+
+    /**
+     * 订单查询
+     */
+    function selectOrders(){
+    window.location.href="customersorders.html?entId="+entId;
+    }
+
+
+</script>
+</body>
+
+</html>
